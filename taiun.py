@@ -94,7 +94,7 @@ def get_natal_tenchusatsu(day_kanshi_idx: int) -> list:
     ]
     return tenchusatsu_groups[group]
 
-def calc_daiun(gender: str, day_kan: str, day_kanshi_idx: int, year_kan: str, month_kanshi_idx: int, 
+def calc_taiun(gender: str, day_kan: str, day_kanshi_idx: int, year_kan: str, month_kanshi_idx: int, 
                birth_jst: datetime, prev_setsunyu_jst: datetime, next_setsunyu_jst: datetime,
                is_shukugaku_style: bool = False) -> dict:
     """
@@ -128,16 +128,16 @@ def calc_daiun(gender: str, day_kan: str, day_kanshi_idx: int, year_kan: str, mo
         else:
             current_idx = (current_idx - 1) % 60
             
-        daiun_kanshi = KANSHI_LIST[current_idx]
-        daiun_kan = daiun_kanshi[0]
-        daiun_shi = daiun_kanshi[1]
+        taiun_kanshi = KANSHI_LIST[current_idx]
+        taiun_kan = taiun_kanshi[0]
+        taiun_shi = taiun_kanshi[1]
         
         # 星の算出
-        judai = JUDAI_SHUSEI_MASTER[day_kan][daiun_kan] + "星"
-        junidai = JUNIDAI_JUSEI_MASTER[day_kan][daiun_shi] + "星"
+        judai = JUDAI_SHUSEI_MASTER[day_kan][taiun_kan] + "星"
+        junidai = JUNIDAI_JUSEI_MASTER[day_kan][taiun_shi] + "星"
         
         # 大運天中殺の判定
-        is_tenchusaku = daiun_shi in natal_tenchusatsu
+        is_tenchusaku = taiun_shi in natal_tenchusatsu
         
         # 年齢範囲
         age_from = start_age + (i * 10)
@@ -146,14 +146,14 @@ def calc_daiun(gender: str, day_kan: str, day_kanshi_idx: int, year_kan: str, mo
         periods.append({
             "index": i + 1,
             "age_range": f"{age_from}-{age_to}",
-            "kanshi": {"no": current_idx + 1, "name": daiun_kanshi},
+            "kanshi": {"no": current_idx + 1, "name": taiun_kanshi},
             "judai_shusei": judai,
             "junidai_jusei": junidai,
             "is_tenchusaku": is_tenchusaku
         })
 
     return {
-        "daiun_config": {
+        "taiun_config": {
             "direction": direction,
             "start_age": start_age,
             "gender": gender,

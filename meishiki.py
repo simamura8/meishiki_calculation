@@ -15,7 +15,7 @@ from pathlib import Path
 
 from zokan import calc_zokan
 from yousen import calc_yousen
-from daiun import calc_daiun
+from taiun import calc_taiun
 from nenun import calc_nenun
 
 # -------------------------------------------------------
@@ -303,7 +303,7 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
 
         # Step 7: 大運の算出
         next_setsunyu_dt = datetime.strptime(month_info["next_sekki_jst"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=JST)
-        daiun_result = calc_daiun(
+        taiun_result = calc_taiun(
             gender=gender,
             day_kan=day_info["kan"],
             day_kanshi_idx=day_info["number"],
@@ -315,7 +315,7 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
         )
 
         # Step 8: 年運の算出（100年分）
-        natal_tenchusatsu = daiun_result["daiun_config"]["natal_tenchusatsu"]
+        natal_tenchusatsu = taiun_result["taiun_config"]["natal_tenchusatsu"]
         nenun_result = calc_nenun(
             day_kan=day_info["kan"],
             effective_birth_year=month_info["effective_year"],
@@ -333,7 +333,7 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
         "month_zokan":  zokan_result["month_zokan"],
         "day_zokan":    zokan_result["day_zokan"],
         "yousen":       yousen_result,
-        "daiun":        daiun_result,
+        "taiun":        taiun_result,
         "nenun":        nenun_result,
         "is_yashiko":   day_info["is_yashiko"],
         "_detail": {
@@ -381,12 +381,12 @@ def print_result(result: dict, birth_str: str):
     print(f"  晩年期 (左下)    : {jn['bannen']}")
     print("-" * 50)
     print(f"  [大運]")
-    dc = result["daiun"]["daiun_config"]
+    dc = result["taiun"]["taiun_config"]
     gender_str = "男性" if dc['gender'] == 'm' else "女性"
     dir_str = "順回り" if dc['direction'] == 'Forward' else "逆回り"
     print(f"  性別: {gender_str}, 回り: {dir_str}")
     print(f"  立運: {dc['start_age']}歳運, 宿命天中殺: {dc['natal_tenchusatsu'][0]}{dc['natal_tenchusatsu'][1]}天中殺")
-    for p in result["daiun"]["periods"][:5]: # 5旬目まで表示
+    for p in result["taiun"]["periods"][:5]: # 5旬目まで表示
         t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
         print(f"  {p['index']:>2}旬 ({p['age_range']:>5}歳): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}")
     print("  ... (詳細はJSONを参照)")
@@ -409,6 +409,8 @@ def print_result(result: dict, birth_str: str):
 
 if __name__ == "__main__":
     import sys
+    import json
+    import os
 
     if len(sys.argv) >= 4:
         # コマンドライン引数から
@@ -429,3 +431,17 @@ if __name__ == "__main__":
         
     result = calc_meishiki(birth_str, gender)
     print_result(result, birth_str)
+    
+    # output フォルダにJSONとして出力
+    output_dir = Path("output")
+    output_dir.mkdir(exist_ok=True)
+    
+    # ファイル名に使用できない文字を置換
+    safe_birth_str = birth_str.replace(" ", "_").replace(":", "")
+    filename = f"{safe_birth_str}_{gender}.json"
+    output_path = output_dir / filename
+    
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(result, f, ensure_ascii=False, indent=2)
+    
+    print(f"\n[INFO] 全データ(100年分の年運など)を {output_path} に出力しました。")

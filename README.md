@@ -10,7 +10,7 @@
 | `meishiki.py` | 生年月日から年干支・月干支・日干支を算出 |
 | `zokan.py` | 節入りからの経過時間を計算し、蔵干（二十八宿）を算出 |
 | `yousen.py` | ハッシュマップを用いて陽占（十大主星・十二大従星）を算出 |
-| `daiun.py` | 大運（10年ごとの運気の切り替わり）と大運天中殺を算出 |
+| `taiun.py` | 大運（10年ごとの運気の切り替わり）と大運天中殺を算出 |
 | `nenun.py` | 生年から100年分の年運と年運天中殺を算出 |
 
 ## セットアップ
@@ -51,8 +51,8 @@ print(result["month_zokan"])   # 戊
 print(result["day_zokan"])     # 庚
 print(result["yousen"]["judai_shusei"]["center"])  # 玉堂星
 print(result["yousen"]["junidai_jusei"]["bannen"]) # 天極星
-print(result["daiun"]["daiun_config"]["start_age"]) # 2 (立運)
-print(result["daiun"]["periods"][0]["kanshi"]["name"]) # 乙未 (大運1旬目の干支)
+print(result["taiun"]["taiun_config"]["start_age"]) # 2 (立運)
+print(result["taiun"]["periods"][0]["kanshi"]["name"]) # 乙未 (大運1旬目の干支)
 print(result["nenun"][0]["year"]) # 1996 (0歳の年)
 print(result["nenun"][0]["judai_shusei"]) # 牽牛星 (0歳の十大主星)
 print(result["is_yashiko"])    # False（夜子刻フラグ）
