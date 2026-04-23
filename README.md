@@ -9,6 +9,7 @@
 | `calculate_sekki_sqlite.py` | 12節気（節入り時刻）を天文計算し、SQLite DBに保存 |
 | `meishiki.py` | 生年月日から年干支・月干支・日干支を算出 |
 | `zokan.py` | 節入りからの経過時間を計算し、蔵干（二十八宿）を算出 |
+| `yousen.py` | ハッシュマップを用いて陽占（十大主星・十二大従星）を算出 |
 
 ## セットアップ
 
@@ -44,6 +45,8 @@ print(result["day_pillar"])    # 辛巳
 print(result["year_zokan"])    # 癸
 print(result["month_zokan"])   # 戊
 print(result["day_zokan"])     # 庚
+print(result["yousen"]["judai_shusei"]["center"])  # 玉堂星
+print(result["yousen"]["junidai_jusei"]["bannen"]) # 天極星
 print(result["is_yashiko"])    # False（夜子刻フラグ）
 ```
 
@@ -66,6 +69,10 @@ print(result["is_yashiko"])    # False（夜子刻フラグ）
 - 誕生日時と、その月の「節入り日時」との差分から経過秒数を計算
 - 各十二支の「初元・中元・本元」が切り替わる日数（累計秒数）と比較して判定
 - 30日分（2,592,000秒）を超える場合、またはすべての条件から外れた場合は「本元」を適用
+
+### 陽占（十大主星・十二大従星）
+- **十大主星**: 日干を基準に、対象の干（年干、月干、年支蔵干、月支蔵干、日支蔵干）との組み合わせを定義済みハッシュマップから直接取得
+- **十二大従星**: 日干を基準に、対象の支（年支、月支、日支）との組み合わせをハッシュマップから取得（※戊と己は火土同根として扱い、丙・丁と同じ星を適用）
 
 ## 使用ライブラリ
 

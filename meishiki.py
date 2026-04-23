@@ -14,6 +14,7 @@ from datetime import datetime, timedelta, date
 from pathlib import Path
 
 from zokan import calc_zokan
+from yousen import calc_yousen
 
 # -------------------------------------------------------
 # 定数定義
@@ -272,6 +273,19 @@ def calc_meishiki(birth_datetime_str: str, db_path: str = None) -> dict:
         setsunyu_dt = datetime.strptime(month_info["sekki_jst"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=JST)
         zokan_result = calc_zokan(year_info["shi"], month_kanshi["shi"], day_info["shi"], birth_dt, setsunyu_dt)
 
+        # Step 6: 陽占（十大主星・十二大従星）
+        yousen_result = calc_yousen(
+            day_kan=day_info["kan"],
+            year_kan=year_info["kan"],
+            month_kan=month_kanshi["kan"],
+            year_shi=year_info["shi"],
+            month_shi=month_kanshi["shi"],
+            day_shi=day_info["shi"],
+            year_zokan=zokan_result["year_zokan"],
+            month_zokan=zokan_result["month_zokan"],
+            day_zokan=zokan_result["day_zokan"]
+        )
+
     finally:
         conn.close()
 
@@ -282,6 +296,7 @@ def calc_meishiki(birth_datetime_str: str, db_path: str = None) -> dict:
         "year_zokan":   zokan_result["year_zokan"],
         "month_zokan":  zokan_result["month_zokan"],
         "day_zokan":    zokan_result["day_zokan"],
+        "yousen":       yousen_result,
         "is_yashiko":   day_info["is_yashiko"],
         "_detail": {
             "effective_year":  month_info["effective_year"],
@@ -313,6 +328,19 @@ def print_result(result: dict, birth_str: str):
     print(f"  日干支: {result['day_pillar']} (蔵干: {result['day_zokan']})")
     if result["is_yashiko"]:
         print(f"  ※ 夜子刻（23時以降）: 日干支は翌日扱い")
+    print("-" * 50)
+    print(f"  [陽占（十大主星・十二大従星）]")
+    ys = result["yousen"]
+    jd = ys["judai_shusei"]
+    jn = ys["junidai_jusei"]
+    print(f"  北 (親・目上)    : {jd['north']}")
+    print(f"  東 (社会・兄弟)  : {jd['east']}")
+    print(f"  中央 (自分自身)  : {jd['center']}")
+    print(f"  西 (配偶者)      : {jd['west']}")
+    print(f"  南 (子供・目下)  : {jd['south']}")
+    print(f"  初年期 (右上)    : {jn['hatsunen']}")
+    print(f"  中年期 (右下)    : {jn['chuunen']}")
+    print(f"  晩年期 (左下)    : {jn['bannen']}")
     print("-" * 50)
     print(f"  [詳細]")
     print(f"  有効年: {d['effective_year']}年")
