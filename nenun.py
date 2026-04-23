@@ -17,14 +17,14 @@ KANSHI_LIST = [
     "甲寅", "乙卯", "丙辰", "丁巳", "戊午", "己未", "庚申", "辛酉", "壬戌", "癸亥"
 ]
 
-def calc_nenun(day_kan: str, effective_birth_year: int, natal_tenchusatsu: list, natal_kanshi: dict, count: int = 100) -> list:
+def calc_nenun(day_kan: str, effective_birth_year: int, seihou_tenchusatsu: list, natal_kanshi: dict, count: int = 100) -> list:
     """
     年運を指定年数分（デフォルト100年）算出する。
     
     Args:
         day_kan: 日干（例: "辛"）
         effective_birth_year: 立春基準の有効な誕生年（0歳の年）
-        natal_tenchusatsu: 宿命天中殺のリスト（例: ["申", "酉"]）
+        seihou_tenchusatsu: 西方天中殺のリスト（例: ["申", "酉"]）
         count: 算出する年数
         
     Returns:
@@ -46,7 +46,7 @@ def calc_nenun(day_kan: str, effective_birth_year: int, natal_tenchusatsu: list,
         junidai = JUNIDAI_JUSEI_MASTER[day_kan][nenun_shi] + "星"
         
         # 年運天中殺の判定
-        is_tenchusaku = nenun_shi in natal_tenchusatsu
+        is_tenchusaku = nenun_shi in seihou_tenchusatsu
         
         # 位相法の判定
         isouhou_vs_year = get_isouhou(nenun_kanshi, natal_kanshi["year"])

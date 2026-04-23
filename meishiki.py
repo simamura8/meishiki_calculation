@@ -332,13 +332,20 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
         )
 
         # Step 8: 年運の算出（100年分）
-        natal_tenchusatsu = taiun_result["taiun_config"]["natal_tenchusatsu"]
+        seihou_tenchusatsu = taiun_result["taiun_config"]["seihou_tenchusatsu"]
         nenun_result = calc_nenun(
             day_kan=day_info["kan"],
             effective_birth_year=month_info["effective_year"],
-            natal_tenchusatsu=natal_tenchusatsu,
+            seihou_tenchusatsu=seihou_tenchusatsu,
             natal_kanshi=natal_kanshi
         )
+        
+        # 宿命天中殺（生年中殺、生月中殺）の判定
+        shukumei_tenchusatsu = []
+        if year_info["shi"] in seihou_tenchusatsu:
+            shukumei_tenchusatsu.append("生年中殺")
+        if month_kanshi["shi"] in seihou_tenchusatsu:
+            shukumei_tenchusatsu.append("生月中殺")
 
     finally:
         conn.close()
@@ -354,6 +361,7 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
         "taiun":        taiun_result,
         "nenun":        nenun_result,
         "natal_isouhou": natal_isouhou,
+        "shukumei_tenchusatsu": shukumei_tenchusatsu,
         "is_yashiko":   day_info["is_yashiko"],
         "_detail": {
             "effective_year":  month_info["effective_year"],
@@ -400,7 +408,10 @@ def print_result(result: dict, birth_str: str):
     print(f"  晩年期 (左下)    : {jn['bannen']}")
     
     dc = result["taiun"]["taiun_config"]
-    print(f"  宿命天中殺       : {dc['natal_tenchusatsu'][0]}{dc['natal_tenchusatsu'][1]}天中殺")
+    print(f"  西方天中殺       : {dc['seihou_tenchusatsu'][0]}{dc['seihou_tenchusatsu'][1]}天中殺")
+    
+    if result["shukumei_tenchusatsu"]:
+        print(f"  宿命天中殺       : {'、'.join(result['shukumei_tenchusatsu'])}")
     
     # 宿命の位相法を表示
     ni = result["natal_isouhou"]

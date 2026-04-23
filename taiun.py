@@ -72,9 +72,9 @@ def calculate_unsu(birth_jst: datetime, prev_setsunyu_jst: datetime, next_setsun
         
     return unsu
 
-def get_natal_tenchusatsu(day_kanshi_idx: int) -> list:
+def get_seihou_tenchusatsu(day_kanshi_idx: int) -> list:
     """
-    日干支から宿命天中殺の地支のペアを取得する。
+    日干支から西方天中殺の地支のペアを取得する。
     (day_kanshi_idx は 1〜60)
     """
     # 干支番号から天中殺グループを特定
@@ -116,7 +116,7 @@ def calc_taiun(gender: str, day_kan: str, day_kanshi_idx: int, year_kan: str, mo
     start_age = calculate_unsu(birth_jst, prev_setsunyu_jst, next_setsunyu_jst, direction, is_shukugaku_style)
     
     # 宿命天中殺の特定
-    natal_tenchusatsu = get_natal_tenchusatsu(day_kanshi_idx)
+    seihou_tenchusatsu = get_seihou_tenchusatsu(day_kanshi_idx)
     
     periods = []
     
@@ -139,7 +139,7 @@ def calc_taiun(gender: str, day_kan: str, day_kanshi_idx: int, year_kan: str, mo
         junidai = JUNIDAI_JUSEI_MASTER[day_kan][taiun_shi] + "星"
         
         # 大運天中殺の判定
-        is_tenchusaku = taiun_shi in natal_tenchusatsu
+        is_tenchusaku = taiun_shi in seihou_tenchusatsu
         
         # 位相法の判定
         isouhou_vs_year = get_isouhou(taiun_kanshi, natal_kanshi["year"])
@@ -176,7 +176,7 @@ def calc_taiun(gender: str, day_kan: str, day_kanshi_idx: int, year_kan: str, mo
             "start_age": start_age,
             "gender": gender,
             "is_shukugaku_style": is_shukugaku_style,
-            "natal_tenchusatsu": natal_tenchusatsu
+            "seihou_tenchusatsu": seihou_tenchusatsu
         },
         "periods": periods
     }
