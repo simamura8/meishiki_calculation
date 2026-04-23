@@ -411,6 +411,11 @@ def print_result(result: dict, birth_str: str):
     print(f"  初年期 (右上)    : {jn['hatsunen']}")
     print(f"  中年期 (右下)    : {jn['chuunen']}")
     print(f"  晩年期 (左下)    : {jn['bannen']}")
+    print("")
+    print(f"  | 　　　 | {jd['north']} | {jn['hatsunen']} |")
+    print(f"  | {jd['west']} | {jd['center']} | {jd['east']} |")
+    print(f"  | {jn['bannen']} | {jd['south']} | {jn['chuunen']} |")
+    print("")
     
     dc = result["taiun"]["taiun_config"]
     print(f"  西方天中殺       : {dc['seihou_tenchusatsu'][0]}{dc['seihou_tenchusatsu'][1]}天中殺")
