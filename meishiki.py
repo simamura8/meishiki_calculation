@@ -13,6 +13,8 @@ import sqlite3
 from datetime import datetime, timedelta, date
 from pathlib import Path
 
+from zokan import calc_zokan
+
 # -------------------------------------------------------
 # 定数定義
 # -------------------------------------------------------
@@ -266,6 +268,10 @@ def calc_meishiki(birth_datetime_str: str, db_path: str = None) -> dict:
         # Step 4: 日干支
         day_info = get_day_kanshi(birth_dt)
 
+        # Step 5: 蔵干（二十八宿）
+        setsunyu_dt = datetime.strptime(month_info["sekki_jst"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=JST)
+        zokan_result = calc_zokan(year_info["shi"], month_kanshi["shi"], day_info["shi"], birth_dt, setsunyu_dt)
+
     finally:
         conn.close()
 
@@ -273,6 +279,9 @@ def calc_meishiki(birth_datetime_str: str, db_path: str = None) -> dict:
         "year_pillar":  year_info["kanshi"],
         "month_pillar": month_kanshi["kanshi"],
         "day_pillar":   day_info["kanshi"],
+        "year_zokan":   zokan_result["year_zokan"],
+        "month_zokan":  zokan_result["month_zokan"],
+        "day_zokan":    zokan_result["day_zokan"],
         "is_yashiko":   day_info["is_yashiko"],
         "_detail": {
             "effective_year":  month_info["effective_year"],
@@ -284,6 +293,7 @@ def calc_meishiki(birth_datetime_str: str, db_path: str = None) -> dict:
             "month_shi":       month_info["shi"],
             "month_shi_idx":   month_info["shi_idx"],
             "day_number":      day_info["number"],
+            "elapsed_days":    zokan_result["debug_info"]["elapsed_days"],
         }
     }
 
@@ -298,15 +308,16 @@ def print_result(result: dict, birth_str: str):
     print(f"  算命学 命式算出結果")
     print(f"  生年月日: {birth_str}")
     print("=" * 50)
-    print(f"  年干支: {result['year_pillar']}")
-    print(f"  月干支: {result['month_pillar']}")
-    print(f"  日干支: {result['day_pillar']}")
+    print(f"  年干支: {result['year_pillar']} (蔵干: {result['year_zokan']})")
+    print(f"  月干支: {result['month_pillar']} (蔵干: {result['month_zokan']})")
+    print(f"  日干支: {result['day_pillar']} (蔵干: {result['day_zokan']})")
     if result["is_yashiko"]:
         print(f"  ※ 夜子刻（23時以降）: 日干支は翌日扱い")
     print("-" * 50)
     print(f"  [詳細]")
     print(f"  有効年: {d['effective_year']}年")
     print(f"  直前の節入り: {d['sekki_name']} ({d['sekki_jst']})")
+    print(f"  節入りからの経過日数: {d['elapsed_days']}日")
     print(f"  月支: {d['month_shi']} ({d['month_shi_idx']}番)")
     print(f"  年干支番号: {d['year_number']}番")
     print(f"  日干支番号: {d['day_number']}番")
