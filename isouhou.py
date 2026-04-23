@@ -107,12 +107,13 @@ def get_sangou(shi_list: list) -> list:
     results = []
     
     if {"申", "子", "辰"}.issubset(unique_shi):
-        results.append("三合(水局)")
+        results.append("三合")
     if {"亥", "卯", "未"}.issubset(unique_shi):
-        results.append("三合(木局)")
+        results.append("三合")
     if {"寅", "午", "戌"}.issubset(unique_shi):
-        results.append("三合(火局)")
+        results.append("三合")
     if {"巳", "酉", "丑"}.issubset(unique_shi):
-        results.append("三合(金局)")
+        results.append("三合")
         
-    return results
+    # 重複を除去
+    return list(set(results))

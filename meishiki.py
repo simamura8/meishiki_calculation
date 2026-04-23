@@ -264,6 +264,11 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
     # 入力パース（JST として扱う）
     from datetime import timezone, timedelta
     JST = timezone(timedelta(hours=9))
+    
+    birth_datetime_str = birth_datetime_str.strip()
+    if len(birth_datetime_str) <= 10:  # 時刻が省略されている場合
+        birth_datetime_str += " 12:00"
+        
     try:
         birth_dt = datetime.strptime(birth_datetime_str, "%Y-%m-%d %H:%M")
     except ValueError:
@@ -415,10 +420,18 @@ def print_result(result: dict, birth_str: str):
     
     # 宿命の位相法を表示
     ni = result["natal_isouhou"]
-    all_natal_isouhou = ni["year_month"] + ni["month_day"] + ni["year_day"] + ni["sangou"]
-    if all_natal_isouhou:
-        isouhou_str = "、".join(set(all_natal_isouhou)) # 重複を除去して表示
-        print(f"  宿命位相法       : {isouhou_str}")
+    natal_isouhou_display = []
+    if ni["year_month"]:
+        natal_isouhou_display.append(f"年月: {','.join(ni['year_month'])}")
+    if ni["month_day"]:
+        natal_isouhou_display.append(f"月日: {','.join(ni['month_day'])}")
+    if ni["year_day"]:
+        natal_isouhou_display.append(f"年日: {','.join(ni['year_day'])}")
+    if ni["sangou"]:
+        natal_isouhou_display.append(f"三合会局")
+        
+    if natal_isouhou_display:
+        print(f"  宿命位相法       : {' / '.join(natal_isouhou_display)}")
     
     print("-" * 50)
     print(f"  [大運]")
@@ -429,16 +442,26 @@ def print_result(result: dict, birth_str: str):
     for p in result["taiun"]["periods"]:
         t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
         i_dict = p["isouhou"]
-        i_list = i_dict["vs_year"] + i_dict["vs_month"] + i_dict["vs_day"] + i_dict["sangou"]
-        i_str = f" [{','.join(set(i_list))}]" if i_list else ""
+        i_parts = []
+        if i_dict["vs_year"]: i_parts.append(f"年:{','.join(i_dict['vs_year'])}")
+        if i_dict["vs_month"]: i_parts.append(f"月:{','.join(i_dict['vs_month'])}")
+        if i_dict["vs_day"]: i_parts.append(f"日:{','.join(i_dict['vs_day'])}")
+        if i_dict["sangou"]: i_parts.append("三合会局")
+        i_str = f" [{', '.join(i_parts)}]" if i_parts else ""
+        
         print(f"  {p['index']:>2}旬 ({p['age_range']:>5}歳): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}{i_str}")
     print("-" * 50)
     print(f"  [年運 (0歳〜99歳)]")
     for p in result["nenun"]:
         t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
         i_dict = p["isouhou"]
-        i_list = i_dict["vs_year"] + i_dict["vs_month"] + i_dict["vs_day"] + i_dict["sangou"]
-        i_str = f" [{','.join(set(i_list))}]" if i_list else ""
+        i_parts = []
+        if i_dict["vs_year"]: i_parts.append(f"年:{','.join(i_dict['vs_year'])}")
+        if i_dict["vs_month"]: i_parts.append(f"月:{','.join(i_dict['vs_month'])}")
+        if i_dict["vs_day"]: i_parts.append(f"日:{','.join(i_dict['vs_day'])}")
+        if i_dict["sangou"]: i_parts.append("三合会局")
+        i_str = f" [{', '.join(i_parts)}]" if i_parts else ""
+        
         print(f"  {p['age']:>2}歳 ({p['year']}年): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}{i_str}")
     print("-" * 50)
     print(f"  [詳細]")
@@ -457,15 +480,30 @@ if __name__ == "__main__":
     import os
 
     if len(sys.argv) >= 4:
-        # コマンドライン引数から
+        # コマンドライン引数から (python meishiki.py 1996-08-12 14:30 m)
         date_str = sys.argv[1]
         time_str = sys.argv[2]
         gender = sys.argv[3].lower()
         birth_str = f"{date_str} {time_str}"
     elif len(sys.argv) == 3:
-        # python meishiki.py "1996-08-12 14:30" m
-        birth_str = sys.argv[1]
-        gender = sys.argv[2].lower()
+        # パターン1: python meishiki.py "1996-08-12 14:30" m
+        # パターン2: python meishiki.py 1996-08-12 m (時刻省略)
+        arg1 = sys.argv[1]
+        arg2 = sys.argv[2].lower()
+        if arg2 in ['m', 'f']:
+            gender = arg2
+            if " " in arg1:
+                birth_str = arg1
+            else:
+                birth_str = f"{arg1} 12:00"
+        else:
+            # パターン3: python meishiki.py 1996-08-12 14:30 (性別省略)
+            birth_str = f"{sys.argv[1]} {sys.argv[2]}"
+            gender = "m"
+    elif len(sys.argv) == 2:
+        # python meishiki.py 1996-08-12
+        birth_str = f"{sys.argv[1]} 12:00"
+        gender = "m"
     else:
         # 引数なしの場合はテストデータで実行
         print("引数不足: テストデータで実行します。")
