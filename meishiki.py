@@ -399,20 +399,22 @@ def print_result(result: dict, birth_str: str):
     print(f"  中年期 (右下)    : {jn['chuunen']}")
     print(f"  晩年期 (左下)    : {jn['bannen']}")
     
+    dc = result["taiun"]["taiun_config"]
+    print(f"  宿命天中殺       : {dc['natal_tenchusatsu'][0]}{dc['natal_tenchusatsu'][1]}天中殺")
+    
     # 宿命の位相法を表示
     ni = result["natal_isouhou"]
     all_natal_isouhou = ni["year_month"] + ni["month_day"] + ni["year_day"] + ni["sangou"]
     if all_natal_isouhou:
         isouhou_str = "、".join(set(all_natal_isouhou)) # 重複を除去して表示
-        print(f"  [宿命 位相法]    : {isouhou_str}")
+        print(f"  宿命位相法       : {isouhou_str}")
     
     print("-" * 50)
     print(f"  [大運]")
-    dc = result["taiun"]["taiun_config"]
     gender_str = "男性" if dc['gender'] == 'm' else "女性"
     dir_str = "順回り" if dc['direction'] == 'Forward' else "逆回り"
     print(f"  性別: {gender_str}, 回り: {dir_str}")
-    print(f"  立運: {dc['start_age']}歳運, 宿命天中殺: {dc['natal_tenchusatsu'][0]}{dc['natal_tenchusatsu'][1]}天中殺")
+    print(f"  立運: {dc['start_age']}歳運")
     for p in result["taiun"]["periods"]:
         t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
         i_dict = p["isouhou"]
