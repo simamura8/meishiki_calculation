@@ -8,6 +8,7 @@
 |---|---|
 | `calculate_sekki_sqlite.py` | 12節気（節入り時刻）を天文計算し、SQLite DBに保存 |
 | `meishiki.py` | 生年月日から年干支・月干支・日干支を算出 |
+| `zokan.py` | 節入りからの経過時間を計算し、蔵干（二十八宿）を算出 |
 
 ## セットアップ
 
@@ -40,6 +41,9 @@ result = calc_meishiki("1996-08-12 14:30")
 print(result["year_pillar"])   # 丙子
 print(result["month_pillar"])  # 戊申
 print(result["day_pillar"])    # 辛巳
+print(result["year_zokan"])    # 癸
+print(result["month_zokan"])   # 戊
+print(result["day_zokan"])     # 庚
 print(result["is_yashiko"])    # False（夜子刻フラグ）
 ```
 
@@ -57,6 +61,11 @@ print(result["is_yashiko"])    # False（夜子刻フラグ）
 ### 日干支
 - 基準日（1800-01-01 = 庚寅/27番）からの経過日数で算出
 - **夜子刻**（23:00以降）は翌日の干支を適用
+
+### 蔵干（二十八宿）
+- 誕生日時と、その月の「節入り日時」との差分から経過秒数を計算
+- 各十二支の「初元・中元・本元」が切り替わる日数（累計秒数）と比較して判定
+- 30日分（2,592,000秒）を超える場合、またはすべての条件から外れた場合は「本元」を適用
 
 ## 使用ライブラリ
 
