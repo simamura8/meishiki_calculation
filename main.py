@@ -1,8 +1,8 @@
 import sys
 import json
 from pathlib import Path
-from meishiki import calc_meishiki
-from zokan import ZOKAN_TABLE
+from sanmei.meishiki import calc_meishiki
+from sanmei.zokan import ZOKAN_TABLE
 
 def print_result(result: dict, birth_str: str):
     """結果を見やすく表示する"""
@@ -142,16 +142,31 @@ if __name__ == "__main__":
         gender = "f"
         
     result = calc_meishiki(birth_str, gender)
-    print_result(result, birth_str)
     
-    output_dir = Path("output")
-    output_dir.mkdir(exist_ok=True)
+    import io
+    from contextlib import redirect_stdout
+    
+    f_io = io.StringIO()
+    with redirect_stdout(f_io):
+        print_result(result, birth_str)
+        
+    md_str = f_io.getvalue()
+    print(md_str, end="")
+    
+    json_dir = Path("jsonoutput")
+    json_dir.mkdir(exist_ok=True)
+    md_dir = Path("markdownoutput")
+    md_dir.mkdir(exist_ok=True)
     
     safe_birth_str = birth_str.replace(" ", "_").replace(":", "")
-    filename = f"{safe_birth_str}_{gender}.json"
-    output_path = output_dir / filename
     
-    with open(output_path, "w", encoding="utf-8") as f:
+    json_path = json_dir / f"{safe_birth_str}_{gender}.json"
+    with open(json_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
+        
+    md_path = md_dir / f"{safe_birth_str}_{gender}.md"
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write(md_str)
     
-    print(f"\n[INFO] 全データ(100年分の年運など)を {output_path} に出力しました。")
+    print(f"\n[INFO] 詳細JSONデータを {json_path} に出力しました。")
+    print(f"[INFO] Markdown形式の出力を {md_path} に保存しました。")

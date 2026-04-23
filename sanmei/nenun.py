@@ -4,8 +4,8 @@ nenun.py
 算命学 年運（毎年の運気）算出モジュール
 """
 
-from yousen import JUDAI_SHUSEI_MASTER, JUNIDAI_JUSEI_MASTER
-from isouhou import get_isouhou, get_sangou
+from .yousen import JUDAI_SHUSEI_MASTER, JUNIDAI_JUSEI_MASTER
+from .isouhou import get_isouhou, get_sangou
 
 # 干支のリスト
 KANSHI_LIST = [

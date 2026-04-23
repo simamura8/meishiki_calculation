@@ -10,7 +10,8 @@ __pycache__/
 *.pyo
 
 # 一時ファイル・出力
-output/
+jsonoutput/
+markdownoutput/
 *.txt
 !README.md
 !requirements.txt

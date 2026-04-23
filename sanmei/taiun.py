@@ -5,8 +5,8 @@ daiun.py
 """
 
 from datetime import datetime
-from yousen import JUDAI_SHUSEI_MASTER, JUNIDAI_JUSEI_MASTER
-from isouhou import get_isouhou, get_sangou
+from .yousen import JUDAI_SHUSEI_MASTER, JUNIDAI_JUSEI_MASTER
+from .isouhou import get_isouhou, get_sangou
 
 # 十干と十二支のリスト（kanshi_listは1-indexedとするため別途計算用に用意）
 KAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]

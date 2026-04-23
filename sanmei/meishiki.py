@@ -13,17 +13,17 @@ import sqlite3
 from datetime import datetime, timedelta, date
 from pathlib import Path
 
-from zokan import calc_zokan
-from yousen import calc_yousen
-from taiun import calc_taiun
-from nenun import calc_nenun
-from isouhou import get_isouhou, get_sangou
+from .zokan import calc_zokan
+from .yousen import calc_yousen
+from .taiun import calc_taiun
+from .nenun import calc_nenun
+from .isouhou import get_isouhou, get_sangou
 
 # -------------------------------------------------------
 # 定数定義
 # -------------------------------------------------------
 
-DB_PATH = Path(__file__).parent / "sekki.db"
+DB_PATH = Path(__file__).parent.parent / "data" / "sekki.db"
 
 # 十干（天干）
 KAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
