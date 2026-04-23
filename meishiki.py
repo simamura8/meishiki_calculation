@@ -386,16 +386,14 @@ def print_result(result: dict, birth_str: str):
     dir_str = "順回り" if dc['direction'] == 'Forward' else "逆回り"
     print(f"  性別: {gender_str}, 回り: {dir_str}")
     print(f"  立運: {dc['start_age']}歳運, 宿命天中殺: {dc['natal_tenchusatsu'][0]}{dc['natal_tenchusatsu'][1]}天中殺")
-    for p in result["taiun"]["periods"][:5]: # 5旬目まで表示
+    for p in result["taiun"]["periods"]:
         t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
         print(f"  {p['index']:>2}旬 ({p['age_range']:>5}歳): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}")
-    print("  ... (詳細はJSONを参照)")
     print("-" * 50)
-    print(f"  [年運 (抜粋: 0歳〜4歳)]")
-    for p in result["nenun"][:5]:
+    print(f"  [年運 (0歳〜99歳)]")
+    for p in result["nenun"]:
         t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
         print(f"  {p['age']:>2}歳 ({p['year']}年): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}")
-    print("  ... (詳細はJSONで100年分取得可能)")
     print("-" * 50)
     print(f"  [詳細]")
     print(f"  有効年: {d['effective_year']}年")
