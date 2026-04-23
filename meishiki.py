@@ -16,6 +16,7 @@ from pathlib import Path
 from zokan import calc_zokan
 from yousen import calc_yousen
 from daiun import calc_daiun
+from nenun import calc_nenun
 
 # -------------------------------------------------------
 # 定数定義
@@ -313,6 +314,14 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
             next_setsunyu_jst=next_setsunyu_dt
         )
 
+        # Step 8: 年運の算出（100年分）
+        natal_tenchusatsu = daiun_result["daiun_config"]["natal_tenchusatsu"]
+        nenun_result = calc_nenun(
+            day_kan=day_info["kan"],
+            effective_birth_year=month_info["effective_year"],
+            natal_tenchusatsu=natal_tenchusatsu
+        )
+
     finally:
         conn.close()
 
@@ -325,6 +334,7 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
         "day_zokan":    zokan_result["day_zokan"],
         "yousen":       yousen_result,
         "daiun":        daiun_result,
+        "nenun":        nenun_result,
         "is_yashiko":   day_info["is_yashiko"],
         "_detail": {
             "effective_year":  month_info["effective_year"],
@@ -380,6 +390,12 @@ def print_result(result: dict, birth_str: str):
         t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
         print(f"  {p['index']:>2}旬 ({p['age_range']:>5}歳): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}")
     print("  ... (詳細はJSONを参照)")
+    print("-" * 50)
+    print(f"  [年運 (抜粋: 0歳〜4歳)]")
+    for p in result["nenun"][:5]:
+        t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
+        print(f"  {p['age']:>2}歳 ({p['year']}年): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}")
+    print("  ... (詳細はJSONで100年分取得可能)")
     print("-" * 50)
     print(f"  [詳細]")
     print(f"  有効年: {d['effective_year']}年")
