@@ -25,93 +25,86 @@ def print_result(result: dict, birth_str: str):
     print(f"  生年月日: {birth_str}")
     print("=" * 50)
     
-    print("\n  [陰占]")
-    print("  | 陰占 | | | |")
-    print("  | --- | --- | --- | --- |")
-    print(f"  | No. | {d['day_number']} | {d['month_shi_idx']} | {d['year_number']} |")
-    print(f"  | 天干 | {result['day_pillar'][0]} | {result['month_pillar'][0]} | {result['year_pillar'][0]} |")
-    print(f"  | 地支 | {result['day_pillar'][1]} | {result['month_pillar'][1]} | {result['year_pillar'][1]} |")
-    print(f"  | 蔵干 | {dz_pri} | {mz_pri} | {yz_pri} |")
-    print(f"  | | {dz_oth} | {mz_oth} | {yz_oth} |")
+    print("\n## 陰占")
+    print("| 陰占 | | | |")
+    print("| --- | --- | --- | --- |")
+    print(f"| No. | {d['day_number']} | {d['month_shi_idx']} | {d['year_number']} |")
+    print(f"| 天干 | {result['day_pillar'][0]} | {result['month_pillar'][0]} | {result['year_pillar'][0]} |")
+    print(f"| 地支 | {result['day_pillar'][1]} | {result['month_pillar'][1]} | {result['year_pillar'][1]} |")
+    print(f"| 蔵干 | {dz_pri} | {mz_pri} | {yz_pri} |")
+    print(f"| | {dz_oth} | {mz_oth} | {yz_oth} |")
     print("")
     
     if result["is_yashiko"]:
-        print(f"  ※ 夜子刻（23時以降）: 日干支は翌日扱い\n")
+        print(f"※ 夜子刻（23時以降）: 日干支は翌日扱い\n")
         
-    print("-" * 50)
-    print(f"  [陽占（十大主星・十二大従星）]")
     ys = result["yousen"]
     jd = ys["judai_shusei"]
     jn = ys["junidai_jusei"]
-    print(f"  北 (親・目上)    : {jd['north']}")
-    print(f"  東 (社会・兄弟)  : {jd['east']}")
-    print(f"  中央 (自分自身)  : {jd['center']}")
-    print(f"  西 (配偶者)      : {jd['west']}")
-    print(f"  南 (子供・目下)  : {jd['south']}")
-    print(f"  初年期 (右上)    : {jn['hatsunen']}")
-    print(f"  中年期 (右下)    : {jn['chuunen']}")
-    print(f"  晩年期 (左下)    : {jn['bannen']}")
-    print("")
-    print("  [陽占 マトリックス]")
-    print("  | 陽占 | | | |")
-    print("  | --- | --- | --- | --- |")
-    print(f"  | 　　　 | {jd['north']} | {jn['hatsunen']} |")
-    print(f"  | {jd['west']} | {jd['center']} | {jd['east']} |")
-    print(f"  | {jn['bannen']} | {jd['south']} | {jn['chuunen']} |")
+    
+    print("## 陽占")
+    print("| 陽占 | | | |")
+    print("| --- | --- | --- | --- |")
+    print(f"| 　　　 | {jd['north']} | {jn['hatsunen']} |")
+    print(f"| {jd['west']} | {jd['center']} | {jd['east']} |")
+    print(f"| {jn['bannen']} | {jd['south']} | {jn['chuunen']} |")
     print("")
     
     dc = result["taiun"]["taiun_config"]
-    print(f"  西方天中殺       : {dc['seihou_tenchusatsu'][0]}{dc['seihou_tenchusatsu'][1]}天中殺")
+    print(f"西方天中殺: {dc['seihou_tenchusatsu'][0]}{dc['seihou_tenchusatsu'][1]}天中殺")
     
     if result["shukumei_tenchusatsu"]:
-        print(f"  宿命天中殺       : {'、'.join(result['shukumei_tenchusatsu'])}")
+        print(f"宿命天中殺: {'、'.join(result['shukumei_tenchusatsu'])}")
     
     # 宿命の位相法を表示
     ni = result["natal_isouhou"]
     natal_isouhou_display = []
     if ni["year_month"]:
-        natal_isouhou_display.append(f"年月: {','.join(ni['year_month'])}")
+        natal_isouhou_display.append(f"年月:{','.join(ni['year_month'])}")
     if ni["month_day"]:
-        natal_isouhou_display.append(f"月日: {','.join(ni['month_day'])}")
+        natal_isouhou_display.append(f"月日:{','.join(ni['month_day'])}")
     if ni["year_day"]:
-        natal_isouhou_display.append(f"年日: {','.join(ni['year_day'])}")
+        natal_isouhou_display.append(f"年日:{','.join(ni['year_day'])}")
     if ni["sangou"]:
         natal_isouhou_display.append(f"三合会局")
         
     if natal_isouhou_display:
-        print(f"  宿命位相法       : {' / '.join(natal_isouhou_display)}")
+        print(f"宿命位相法: {' / '.join(natal_isouhou_display)}")
+    print("")
     
-    print("-" * 50)
-    print(f"  [大運]")
+    print("## 大運")
     gender_str = "男性" if dc['gender'] == 'm' else "女性"
     dir_str = "順回り" if dc['direction'] == 'Forward' else "逆回り"
-    print(f"  性別: {gender_str}, 回り: {dir_str}")
-    print(f"  立運: {dc['start_age']}歳運")
+    print(f"性別: {gender_str}, 回り: {dir_str}, 立運: {dc['start_age']}歳運\n")
+    print("| 旬 | 年齢 | 干支 | 十大主星 | 十二大従星 | 天中殺 | 位相法 |")
+    print("| --- | --- | --- | --- | --- | --- | --- |")
     for p in result["taiun"]["periods"]:
-        t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
+        t_satsu = "天中殺" if p["is_tenchusaku"] else ""
         i_dict = p["isouhou"]
         i_parts = []
         if i_dict["vs_year"]: i_parts.append(f"年:{','.join(i_dict['vs_year'])}")
         if i_dict["vs_month"]: i_parts.append(f"月:{','.join(i_dict['vs_month'])}")
         if i_dict["vs_day"]: i_parts.append(f"日:{','.join(i_dict['vs_day'])}")
         if i_dict["sangou"]: i_parts.append("三合会局")
-        i_str = f" [{', '.join(i_parts)}]" if i_parts else ""
+        i_str = f"{', '.join(i_parts)}" if i_parts else ""
         
-        print(f"  {p['index']:>2}旬 ({p['age_range']:>5}歳): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}{i_str}")
-    print("-" * 50)
-    print(f"  [年運 (0歳〜99歳)]")
+        print(f"| {p['index']}旬 | {p['age_range']}歳 | {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']} | {t_satsu} | {i_str} |")
+    
+    print("\n## 年運 (0歳〜99歳)")
+    print("| 年齢 | 西暦 | 干支 | 十大主星 | 十二大従星 | 天中殺 | 位相法 |")
+    print("| --- | --- | --- | --- | --- | --- | --- |")
     for p in result["nenun"]:
-        t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
+        t_satsu = "天中殺" if p["is_tenchusaku"] else ""
         i_dict = p["isouhou"]
         i_parts = []
         if i_dict["vs_year"]: i_parts.append(f"年:{','.join(i_dict['vs_year'])}")
         if i_dict["vs_month"]: i_parts.append(f"月:{','.join(i_dict['vs_month'])}")
         if i_dict["vs_day"]: i_parts.append(f"日:{','.join(i_dict['vs_day'])}")
         if i_dict["sangou"]: i_parts.append("三合会局")
-        i_str = f" [{', '.join(i_parts)}]" if i_parts else ""
+        i_str = f"{', '.join(i_parts)}" if i_parts else ""
         
-        print(f"  {p['age']:>2}歳 ({p['year']}年): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}{i_str}")
-    print("-" * 50)
+        print(f"| {p['age']}歳 | {p['year']}年 | {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']} | {t_satsu} | {i_str} |")
+    print("")
     print(f"  [詳細]")
     print(f"  有効年: {d['effective_year']}年")
     print(f"  直前の節入り: {d['sekki_name']} ({d['sekki_jst']})")
