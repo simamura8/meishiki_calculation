@@ -1,21 +1,33 @@
-MIT License
+算命学命式計算ツール 利用許諾条件 (License)
 
-Copyright (c) 2024 simamura8
+Copyright (c) 2026 simamura8
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+本ソフトウェアは、以下の条件に従って利用を許諾します。
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. 利用の許可
+・個人および非営利目的での利用を許可します。
+・本ソフトウェアを用いて算出された結果（命式図等）を、対面鑑定やブログ、SNS等で利用・公開することは、営利・非営利を問わず自由に行うことができます。
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. 禁止事項
+・本ソフトウェアのソースコードを組み込んだ有料サービスの提供、および本ソフトウェア自体の販売を禁じます。
+・商用アプリやWebサービス等のバックエンドとして本ソフトウェアを無断で利用することを禁じます。
+・著作権表示（Copyright）を削除した状態での配布を禁じます。
+
+3. 免責事項
+・本ソフトウェアを利用したことによるいかなる損害についても、作者は一切の責任を負いません。算命学の解釈や計算結果の正確性については、利用者の責任において確認してください。
+
+---
+
+Terms of Use
+
+1. Permitted Use
+- Personal and non-commercial use is permitted.
+- You are free to use and publish the calculation results (e.g., charts) obtained through this software for professional fortune-telling services, blogs, SNS, etc., regardless of whether it is for-profit or non-profit.
+
+2. Prohibitions
+- Providing paid services that incorporate the source code of this software, or selling the software itself, is prohibited.
+- Unauthorized use of this software as a backend for commercial applications or web services is prohibited.
+- Distribution without the copyright notice is prohibited.
+
+3. Disclaimer
+- The author assumes no responsibility for any damages resulting from the use of this software. The user is responsible for verifying the accuracy of the interpretations and calculation results.
