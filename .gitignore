@@ -1,8 +1,8 @@
 # エフェメリスファイル（大容量バイナリ・各自でダウンロード）
 *.bsp
 
-# SQLiteデータベース（generate_sekki_db.py で生成可能）
-sekki.db
+# SQLiteデータベース（ルートのものは無視、sanmei/内は追跡）
+/sekki.db
 
 # Python キャッシュ
 __pycache__/
@@ -19,3 +19,8 @@ markdownoutput/
 # IDE
 .venv/
 .env
+
+# ビルド生成物
+*.egg-info/
+dist/
+build/

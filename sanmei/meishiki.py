@@ -23,7 +23,7 @@ from .isouhou import get_isouhou, get_sangou
 # 定数定義
 # -------------------------------------------------------
 
-DB_PATH = Path(__file__).parent.parent / "data" / "sekki.db"
+DB_PATH = Path(__file__).parent / "sekki.db"
 
 # 十干（天干）
 KAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]

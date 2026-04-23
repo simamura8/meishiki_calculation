@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sanmei-engine"
+version = "0.1.0"
+description = "算命学の命式（年干支・月干支・日干支）を算出するPythonライブラリ"
+requires-python = ">=3.9"
+dependencies = [
+    "skyfield",
+    "tqdm",
+]
+
+[tool.setuptools.packages.find]
+include = ["sanmei*"]
+
+[tool.setuptools.package-data]
+sanmei = ["sekki.db"]
