@@ -15,6 +15,7 @@ from pathlib import Path
 
 from zokan import calc_zokan
 from yousen import calc_yousen
+from daiun import calc_daiun
 
 # -------------------------------------------------------
 # 定数定義
@@ -89,6 +90,17 @@ def get_month_pillar_info(birth_dt: datetime, conn: sqlite3.Connection) -> dict:
 
     sekki_year, sekki_name, sekki_jst = row
 
+    # 誕生日時より後の最初の節入りを取得（次節）
+    next_row = cursor.execute(
+        "SELECT jst FROM sekki WHERE jst > ? ORDER BY jst ASC LIMIT 1",
+        (birth_str,)
+    ).fetchone()
+    
+    if next_row is None:
+        raise ValueError(f"次節のデータが見つかりません（範囲外の日付: {birth_str}）")
+    
+    next_sekki_jst = next_row[0]
+
     if sekki_name not in SEKKI_TO_MONTH_SHI:
         raise ValueError(f"未定義の節気名: {sekki_name}")
 
@@ -110,6 +122,7 @@ def get_month_pillar_info(birth_dt: datetime, conn: sqlite3.Connection) -> dict:
         "shi_idx":     shi_idx,
         "effective_year": effective_year,
         "sekki_jst":   sekki_jst,
+        "next_sekki_jst": next_sekki_jst,
     }
 
 # -------------------------------------------------------
@@ -180,6 +193,7 @@ def get_month_kanshi(year_kan_idx: int, month_shi_idx: int) -> dict:
         "kanshi": kanshi,
         "kan": kan,
         "shi": shi,
+        "number": KANSHI_LIST.index(kanshi) + 1
     }
 
 # -------------------------------------------------------
@@ -226,7 +240,7 @@ def get_day_kanshi(birth_dt: datetime) -> dict:
 # メイン関数: 命式算出
 # -------------------------------------------------------
 
-def calc_meishiki(birth_datetime_str: str, db_path: str = None) -> dict:
+def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> dict:
     """
     命式（年干支・月干支・日干支）を算出するメイン関数。
 
@@ -286,6 +300,19 @@ def calc_meishiki(birth_datetime_str: str, db_path: str = None) -> dict:
             day_zokan=zokan_result["day_zokan"]
         )
 
+        # Step 7: 大運の算出
+        next_setsunyu_dt = datetime.strptime(month_info["next_sekki_jst"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=JST)
+        daiun_result = calc_daiun(
+            gender=gender,
+            day_kan=day_info["kan"],
+            day_kanshi_idx=day_info["number"],
+            year_kan=year_info["kan"],
+            month_kanshi_idx=month_kanshi["number"],
+            birth_jst=birth_dt,
+            prev_setsunyu_jst=setsunyu_dt,
+            next_setsunyu_jst=next_setsunyu_dt
+        )
+
     finally:
         conn.close()
 
@@ -297,6 +324,7 @@ def calc_meishiki(birth_datetime_str: str, db_path: str = None) -> dict:
         "month_zokan":  zokan_result["month_zokan"],
         "day_zokan":    zokan_result["day_zokan"],
         "yousen":       yousen_result,
+        "daiun":        daiun_result,
         "is_yashiko":   day_info["is_yashiko"],
         "_detail": {
             "effective_year":  month_info["effective_year"],
@@ -342,6 +370,17 @@ def print_result(result: dict, birth_str: str):
     print(f"  中年期 (右下)    : {jn['chuunen']}")
     print(f"  晩年期 (左下)    : {jn['bannen']}")
     print("-" * 50)
+    print(f"  [大運]")
+    dc = result["daiun"]["daiun_config"]
+    gender_str = "男性" if dc['gender'] == 'm' else "女性"
+    dir_str = "順回り" if dc['direction'] == 'Forward' else "逆回り"
+    print(f"  性別: {gender_str}, 回り: {dir_str}")
+    print(f"  立運: {dc['start_age']}歳運, 宿命天中殺: {dc['natal_tenchusatsu'][0]}{dc['natal_tenchusatsu'][1]}天中殺")
+    for p in result["daiun"]["periods"][:5]: # 5旬目まで表示
+        t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
+        print(f"  {p['index']:>2}旬 ({p['age_range']:>5}歳): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}")
+    print("  ... (詳細はJSONを参照)")
+    print("-" * 50)
     print(f"  [詳細]")
     print(f"  有効年: {d['effective_year']}年")
     print(f"  直前の節入り: {d['sekki_name']} ({d['sekki_jst']})")
@@ -355,18 +394,22 @@ def print_result(result: dict, birth_str: str):
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) >= 3:
+    if len(sys.argv) >= 4:
         # コマンドライン引数から
         date_str = sys.argv[1]
         time_str = sys.argv[2]
+        gender = sys.argv[3].lower()
         birth_str = f"{date_str} {time_str}"
-    elif len(sys.argv) == 2:
+    elif len(sys.argv) == 3:
+        # python meishiki.py "1996-08-12 14:30" m
         birth_str = sys.argv[1]
+        gender = sys.argv[2].lower()
     else:
         # 引数なしの場合はテストデータで実行
-        print("引数なし: テストデータで実行します。")
-        print("Usage: python meishiki.py 1996-08-12 14:30\n")
+        print("引数不足: テストデータで実行します。")
+        print("Usage: python meishiki.py \"1996-08-12 14:30\" m\n")
         birth_str = "1996-08-12 14:30"
-
-    result = calc_meishiki(birth_str)
+        gender = "f"
+        
+    result = calc_meishiki(birth_str, gender)
     print_result(result, birth_str)

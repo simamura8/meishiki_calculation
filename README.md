@@ -10,6 +10,7 @@
 | `meishiki.py` | 生年月日から年干支・月干支・日干支を算出 |
 | `zokan.py` | 節入りからの経過時間を計算し、蔵干（二十八宿）を算出 |
 | `yousen.py` | ハッシュマップを用いて陽占（十大主星・十二大従星）を算出 |
+| `daiun.py` | 大運（10年ごとの運気の切り替わり）と大運天中殺を算出 |
 
 ## セットアップ
 
@@ -31,14 +32,16 @@ python calculate_sekki_sqlite.py
 
 ### Step 2: 命式の算出
 
+コマンドラインから実行する場合、第2引数（または第3引数）に性別（`m`: 男性, `f`: 女性）を指定します。
+
 ```bash
-python meishiki.py 1996-08-12 14:30
+python meishiki.py "1996-08-12 14:30" f
 ```
 
 ```python
 from meishiki import calc_meishiki
 
-result = calc_meishiki("1996-08-12 14:30")
+result = calc_meishiki("1996-08-12 14:30", "f")
 print(result["year_pillar"])   # 丙子
 print(result["month_pillar"])  # 戊申
 print(result["day_pillar"])    # 辛巳
@@ -47,6 +50,8 @@ print(result["month_zokan"])   # 戊
 print(result["day_zokan"])     # 庚
 print(result["yousen"]["judai_shusei"]["center"])  # 玉堂星
 print(result["yousen"]["junidai_jusei"]["bannen"]) # 天極星
+print(result["daiun"]["daiun_config"]["start_age"]) # 2 (立運)
+print(result["daiun"]["periods"][0]["kanshi"]["name"]) # 乙未 (1旬目の干支)
 print(result["is_yashiko"])    # False（夜子刻フラグ）
 ```
 
@@ -73,6 +78,11 @@ print(result["is_yashiko"])    # False（夜子刻フラグ）
 ### 陽占（十大主星・十二大従星）
 - **十大主星**: 日干を基準に、対象の干（年干、月干、年支蔵干、月支蔵干、日支蔵干）との組み合わせを定義済みハッシュマップから直接取得
 - **十二大従星**: 日干を基準に、対象の支（年支、月支、日支）との組み合わせをハッシュマップから取得（※戊と己は火土同根として扱い、丙・丁と同じ星を適用）
+
+### 大運（10年ごとの運気）
+- **運行方向**: 年干の陰陽（＋/－）と性別により順回り・逆回りを自動判定
+- **立運（運数）**: 順回りは次節入りまで、逆回りは前節入りまでの日数を3で割り、四捨五入（高尾式）して算出
+- **大運星と天中殺**: 各旬の大運干支と日干から十大主星・十二大従星を算出。日干支から導出される宿命天中殺と大運地支が一致する期間を「大運天中殺」として判定
 
 ## 使用ライブラリ
 
