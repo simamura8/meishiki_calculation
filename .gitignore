@@ -1,0 +1,19 @@
+# エフェメリスファイル（大容量バイナリ・各自でダウンロード）
+*.bsp
+
+# SQLiteデータベース（generate_sekki_db.py で生成可能）
+sekki.db
+
+# Python キャッシュ
+__pycache__/
+*.py[cod]
+*.pyo
+
+# 一時ファイル・出力
+output/
+*.txt
+!README.md
+
+# IDE
+.venv/
+.env
