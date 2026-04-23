@@ -17,6 +17,7 @@ from zokan import calc_zokan
 from yousen import calc_yousen
 from taiun import calc_taiun
 from nenun import calc_nenun
+from isouhou import get_isouhou, get_sangou
 
 # -------------------------------------------------------
 # 定数定義
@@ -301,6 +302,21 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
             day_zokan=zokan_result["day_zokan"]
         )
 
+        # 宿命干支の辞書を作成
+        natal_kanshi = {
+            "year": year_info["kanshi"],
+            "month": month_kanshi["kanshi"],
+            "day": day_info["kanshi"]
+        }
+        
+        # 宿命の位相法
+        natal_isouhou = {
+            "year_month": get_isouhou(natal_kanshi["year"], natal_kanshi["month"]),
+            "month_day": get_isouhou(natal_kanshi["month"], natal_kanshi["day"]),
+            "year_day": get_isouhou(natal_kanshi["year"], natal_kanshi["day"]),
+            "sangou": get_sangou([year_info["shi"], month_kanshi["shi"], day_info["shi"]])
+        }
+
         # Step 7: 大運の算出
         next_setsunyu_dt = datetime.strptime(month_info["next_sekki_jst"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=JST)
         taiun_result = calc_taiun(
@@ -311,7 +327,8 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
             month_kanshi_idx=month_kanshi["number"],
             birth_jst=birth_dt,
             prev_setsunyu_jst=setsunyu_dt,
-            next_setsunyu_jst=next_setsunyu_dt
+            next_setsunyu_jst=next_setsunyu_dt,
+            natal_kanshi=natal_kanshi
         )
 
         # Step 8: 年運の算出（100年分）
@@ -319,7 +336,8 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
         nenun_result = calc_nenun(
             day_kan=day_info["kan"],
             effective_birth_year=month_info["effective_year"],
-            natal_tenchusatsu=natal_tenchusatsu
+            natal_tenchusatsu=natal_tenchusatsu,
+            natal_kanshi=natal_kanshi
         )
 
     finally:
@@ -335,6 +353,7 @@ def calc_meishiki(birth_datetime_str: str, gender: str, db_path: str = None) -> 
         "yousen":       yousen_result,
         "taiun":        taiun_result,
         "nenun":        nenun_result,
+        "natal_isouhou": natal_isouhou,
         "is_yashiko":   day_info["is_yashiko"],
         "_detail": {
             "effective_year":  month_info["effective_year"],
@@ -379,6 +398,14 @@ def print_result(result: dict, birth_str: str):
     print(f"  初年期 (右上)    : {jn['hatsunen']}")
     print(f"  中年期 (右下)    : {jn['chuunen']}")
     print(f"  晩年期 (左下)    : {jn['bannen']}")
+    
+    # 宿命の位相法を表示
+    ni = result["natal_isouhou"]
+    all_natal_isouhou = ni["year_month"] + ni["month_day"] + ni["year_day"] + ni["sangou"]
+    if all_natal_isouhou:
+        isouhou_str = "、".join(set(all_natal_isouhou)) # 重複を除去して表示
+        print(f"  [宿命 位相法]    : {isouhou_str}")
+    
     print("-" * 50)
     print(f"  [大運]")
     dc = result["taiun"]["taiun_config"]
@@ -388,12 +415,18 @@ def print_result(result: dict, birth_str: str):
     print(f"  立運: {dc['start_age']}歳運, 宿命天中殺: {dc['natal_tenchusatsu'][0]}{dc['natal_tenchusatsu'][1]}天中殺")
     for p in result["taiun"]["periods"]:
         t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
-        print(f"  {p['index']:>2}旬 ({p['age_range']:>5}歳): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}")
+        i_dict = p["isouhou"]
+        i_list = i_dict["vs_year"] + i_dict["vs_month"] + i_dict["vs_day"] + i_dict["sangou"]
+        i_str = f" [{','.join(set(i_list))}]" if i_list else ""
+        print(f"  {p['index']:>2}旬 ({p['age_range']:>5}歳): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}{i_str}")
     print("-" * 50)
     print(f"  [年運 (0歳〜99歳)]")
     for p in result["nenun"]:
         t_satsu = " (天中殺)" if p["is_tenchusaku"] else ""
-        print(f"  {p['age']:>2}歳 ({p['year']}年): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}")
+        i_dict = p["isouhou"]
+        i_list = i_dict["vs_year"] + i_dict["vs_month"] + i_dict["vs_day"] + i_dict["sangou"]
+        i_str = f" [{','.join(set(i_list))}]" if i_list else ""
+        print(f"  {p['age']:>2}歳 ({p['year']}年): {p['kanshi']['name']} | {p['judai_shusei']} | {p['junidai_jusei']}{t_satsu}{i_str}")
     print("-" * 50)
     print(f"  [詳細]")
     print(f"  有効年: {d['effective_year']}年")

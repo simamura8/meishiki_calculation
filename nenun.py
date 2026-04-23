@@ -5,6 +5,7 @@ nenun.py
 """
 
 from yousen import JUDAI_SHUSEI_MASTER, JUNIDAI_JUSEI_MASTER
+from isouhou import get_isouhou, get_sangou
 
 # 干支のリスト
 KANSHI_LIST = [
@@ -16,7 +17,7 @@ KANSHI_LIST = [
     "甲寅", "乙卯", "丙辰", "丁巳", "戊午", "己未", "庚申", "辛酉", "壬戌", "癸亥"
 ]
 
-def calc_nenun(day_kan: str, effective_birth_year: int, natal_tenchusatsu: list, count: int = 100) -> list:
+def calc_nenun(day_kan: str, effective_birth_year: int, natal_tenchusatsu: list, natal_kanshi: dict, count: int = 100) -> list:
     """
     年運を指定年数分（デフォルト100年）算出する。
     
@@ -47,13 +48,28 @@ def calc_nenun(day_kan: str, effective_birth_year: int, natal_tenchusatsu: list,
         # 年運天中殺の判定
         is_tenchusaku = nenun_shi in natal_tenchusatsu
         
+        # 位相法の判定
+        isouhou_vs_year = get_isouhou(nenun_kanshi, natal_kanshi["year"])
+        isouhou_vs_month = get_isouhou(nenun_kanshi, natal_kanshi["month"])
+        isouhou_vs_day = get_isouhou(nenun_kanshi, natal_kanshi["day"])
+        
+        # 三合判定
+        all_shis = [natal_kanshi["year"][1], natal_kanshi["month"][1], natal_kanshi["day"][1], nenun_shi]
+        sangou_list = get_sangou(all_shis)
+        
         periods.append({
             "age": age,
             "year": current_year,
             "kanshi": {"no": kanshi_idx + 1, "name": nenun_kanshi},
             "judai_shusei": judai,
             "junidai_jusei": junidai,
-            "is_tenchusaku": is_tenchusaku
+            "is_tenchusaku": is_tenchusaku,
+            "isouhou": {
+                "vs_year": isouhou_vs_year,
+                "vs_month": isouhou_vs_month,
+                "vs_day": isouhou_vs_day,
+                "sangou": sangou_list
+            }
         })
         
     return periods

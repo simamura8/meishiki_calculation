@@ -6,6 +6,7 @@ daiun.py
 
 from datetime import datetime
 from yousen import JUDAI_SHUSEI_MASTER, JUNIDAI_JUSEI_MASTER
+from isouhou import get_isouhou, get_sangou
 
 # 十干と十二支のリスト（kanshi_listは1-indexedとするため別途計算用に用意）
 KAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
@@ -96,6 +97,7 @@ def get_natal_tenchusatsu(day_kanshi_idx: int) -> list:
 
 def calc_taiun(gender: str, day_kan: str, day_kanshi_idx: int, year_kan: str, month_kanshi_idx: int, 
                birth_jst: datetime, prev_setsunyu_jst: datetime, next_setsunyu_jst: datetime,
+               natal_kanshi: dict,
                is_shukugaku_style: bool = False) -> dict:
     """
     大運の1旬〜10旬までのデータを生成する。
@@ -139,6 +141,16 @@ def calc_taiun(gender: str, day_kan: str, day_kanshi_idx: int, year_kan: str, mo
         # 大運天中殺の判定
         is_tenchusaku = taiun_shi in natal_tenchusatsu
         
+        # 位相法の判定
+        isouhou_vs_year = get_isouhou(taiun_kanshi, natal_kanshi["year"])
+        isouhou_vs_month = get_isouhou(taiun_kanshi, natal_kanshi["month"])
+        isouhou_vs_day = get_isouhou(taiun_kanshi, natal_kanshi["day"])
+        
+        # 三合（3支揃う場合）の判定
+        # 宿命の地支3つ ＋ 大運の地支
+        all_shis = [natal_kanshi["year"][1], natal_kanshi["month"][1], natal_kanshi["day"][1], taiun_shi]
+        sangou_list = get_sangou(all_shis)
+        
         # 年齢範囲
         age_from = start_age + (i * 10)
         age_to = age_from + 9
@@ -149,7 +161,13 @@ def calc_taiun(gender: str, day_kan: str, day_kanshi_idx: int, year_kan: str, mo
             "kanshi": {"no": current_idx + 1, "name": taiun_kanshi},
             "judai_shusei": judai,
             "junidai_jusei": junidai,
-            "is_tenchusaku": is_tenchusaku
+            "is_tenchusaku": is_tenchusaku,
+            "isouhou": {
+                "vs_year": isouhou_vs_year,
+                "vs_month": isouhou_vs_month,
+                "vs_day": isouhou_vs_day,
+                "sangou": sangou_list
+            }
         })
 
     return {
