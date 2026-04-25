@@ -4,7 +4,7 @@ from pathlib import Path
 from sanmei.meishiki import calc_meishiki
 from sanmei.zokan import ZOKAN_TABLE
 
-def print_result(result: dict, birth_str: str):
+def print_result(result: dict, birth_str: str, name: str = None):
     """結果を見やすく表示する"""
     d = result["_detail"]
     
@@ -20,10 +20,10 @@ def print_result(result: dict, birth_str: str):
     mz_pri, mz_oth = get_zokan_list(result['month_pillar'][1])
     yz_pri, yz_oth = get_zokan_list(result['year_pillar'][1])
 
-    print("=" * 50)
+    if name:
+        print(f"  氏名: {name}")
     print(f"  算命学 命式算出結果")
     print(f"  生年月日: {birth_str}")
-    print("=" * 50)
     
     print("\n## 陰占")
     print("| 陰占 | | | |")
@@ -112,34 +112,43 @@ def print_result(result: dict, birth_str: str):
     print(f"  月支: {d['month_shi']} ({d['month_shi_idx']}番)")
     print(f"  年干支番号: {d['year_number']}番")
     print(f"  日干支番号: {d['day_number']}番")
-    print("=" * 50)
 
 if __name__ == "__main__":
-    if len(sys.argv) >= 4:
-        date_str = sys.argv[1]
-        time_str = sys.argv[2]
+    name = None
+    if len(sys.argv) >= 5:
+        # python main.py "1996-08-12" "14:30" m "名前"
+        birth_str = f"{sys.argv[1]} {sys.argv[2]}"
         gender = sys.argv[3].lower()
-        birth_str = f"{date_str} {time_str}"
-    elif len(sys.argv) == 3:
-        arg1 = sys.argv[1]
-        arg2 = sys.argv[2].lower()
-        if arg2 in ['m', 'f']:
-            gender = arg2
-            if " " in arg1:
-                birth_str = arg1
-            else:
-                birth_str = f"{arg1} 12:00"
+        name = sys.argv[4]
+    elif len(sys.argv) == 4:
+        if sys.argv[2].lower() in ['m', 'f']:
+            # python main.py "1996-08-12 14:30" m "名前"
+            birth_str = sys.argv[1]
+            gender = sys.argv[2].lower()
+            name = sys.argv[3]
         else:
+            # python main.py "1996-08-12" "14:30" m
+            birth_str = f"{sys.argv[1]} {sys.argv[2]}"
+            gender = sys.argv[3].lower()
+    elif len(sys.argv) == 3:
+        if sys.argv[2].lower() in ['m', 'f']:
+            # python main.py "1996-08-12 14:30" m
+            birth_str = sys.argv[1]
+            gender = sys.argv[2].lower()
+        else:
+            # python main.py "1996-08-12" "14:30"
             birth_str = f"{sys.argv[1]} {sys.argv[2]}"
             gender = "m"
     elif len(sys.argv) == 2:
+        # python main.py "1996-08-12"
         birth_str = f"{sys.argv[1]} 12:00"
         gender = "m"
     else:
         print("引数不足: テストデータで実行します。")
-        print("Usage: python main.py \"1996-08-12 14:30\" m\n")
+        print("Usage: python main.py \"1996-08-12 14:30\" m \"名前\"\n")
         birth_str = "1996-08-12 14:30"
         gender = "f"
+        name = "テスト太郎"
         
     result = calc_meishiki(birth_str, gender)
     
@@ -148,7 +157,7 @@ if __name__ == "__main__":
     
     f_io = io.StringIO()
     with redirect_stdout(f_io):
-        print_result(result, birth_str)
+        print_result(result, birth_str, name)
         
     md_str = f_io.getvalue()
     print(md_str, end="")
@@ -158,13 +167,21 @@ if __name__ == "__main__":
     md_dir = Path("markdownoutput")
     md_dir.mkdir(exist_ok=True)
     
-    safe_birth_str = birth_str.replace(" ", "_").replace(":", "")
-    
-    json_path = json_dir / f"{safe_birth_str}_{gender}.json"
+    if name:
+        import re
+        safe_name = re.sub(r'[\\/:*?"<>|]', '_', name)
+        md_filename = f"{safe_name}.md"
+        json_filename = f"{safe_name}.json"
+    else:
+        safe_birth_str = birth_str.replace(" ", "_").replace(":", "")
+        md_filename = f"{safe_birth_str}_{gender}.md"
+        json_filename = f"{safe_birth_str}_{gender}.json"
+        
+    json_path = json_dir / json_filename
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
         
-    md_path = md_dir / f"{safe_birth_str}_{gender}.md"
+    md_path = md_dir / md_filename
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(md_str)
     
